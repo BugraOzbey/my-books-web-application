@@ -1,0 +1,1 @@
+Update the .env.example file with your own information and remove the .example extension.
