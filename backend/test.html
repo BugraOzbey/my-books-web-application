@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kitap Ekleme Testi</title>
+</head>
+<body>
+  <h1>Kitap Ekle</h1>
+  <form id="bookForm">
+    <input type="text" name="title" placeholder="Kitap Başlığı" required /><br/>
+    <input type="text" name="author" placeholder="Yazar" required /><br/>
+    <input type="number" name="year" placeholder="Yıl" /><br/>
+    <input type="number" name="pageCount" placeholder="Sayfa Sayısı" /><br/>
+    <select name="status">
+      <option value="plan">Plan</option>
+      <option value="reading">Okunuyor</option>
+      <option value="completed">Tamamlandı</option>
+    </select><br/>
+    <input type="number" name="rating" min="1" max="5" placeholder="Puan (1-5)" /><br/>
+    <button type="submit">Ekle</button>
+  </form>
+
+  <p id="result"></p>
+
+  <script>
+    const form = document.getElementById('bookForm');
+    const result = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      // rating ve year gibi sayısal değerler varsa parse et
+      if (data.year) data.year = parseInt(data.year);
+      if (data.pageCount) data.pageCount = parseInt(data.pageCount);
+      if (data.rating) data.rating = parseInt(data.rating);
+
+      try {
+        const res = await fetch('http://localhost:5000/api/books', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const json = await res.json();
+
+        if (res.ok) {
+          result.textContent = `Başarılı! Kitap ID: ${json.id}`;
+          form.reset();
+        } else {
+          result.textContent = `Hata: ${json.message}`;
+        }
+      } catch (err) {
+        result.textContent = 'Sunucuya bağlanılamadı.';
+      }
+    });
+  </script>
+</body>
+</html>
